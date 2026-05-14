@@ -5,7 +5,7 @@ import '../models/user.dart';
 import '../config/api_config.dart';
 
 class ApiService {
-  static const String baseUrl = ApiConfig.baseUrl;
+  static String baseUrl = ApiConfig.baseUrl;
 
   static Future<Map<String, dynamic>> register({
     required String fullName,
@@ -288,4 +288,36 @@ static Future<void> changePassword({
     throw Exception(response.body);
   }
 }
+  static Future<Map<String, dynamic>> getEventSettings() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/settings'),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.body);
+    }
+
+    return jsonDecode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> updateEventSettings(
+      Map<String, dynamic> data) async {
+    final token = await getToken();
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/api/admin/settings'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(response.body);
+    }
+
+    return jsonDecode(response.body);
+  }
+
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'admin_event_settings_screen.dart';
 import 'admin_exhibitors_screen.dart';
 import 'admin_users_screen.dart';
 
@@ -98,6 +99,19 @@ class AdminScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           summaryCard(),
+          adminCard(
+            icon: Icons.event_note,
+            title: 'Настройки выставки',
+            subtitle: 'Даты, место, ссылки — главный экран приложения',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminEventSettingsScreen(),
+                ),
+              );
+            },
+          ),
           adminCard(
             icon: Icons.groups,
             title: 'Управление участниками',

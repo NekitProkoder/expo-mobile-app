@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_tabs_screen.dart';
 import 'services/api_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
   runApp(const ExpoApp());
 }
 
@@ -41,11 +44,8 @@ class _StartupScreenState extends State<StartupScreen> {
 
   Future<void> checkAuth() async {
     final token = await ApiService.getToken();
-
     await Future.delayed(const Duration(milliseconds: 500));
-
     if (!mounted) return;
-
     setState(() {
       isLoggedIn = token != null && token.isNotEmpty;
       isLoading = false;
@@ -63,9 +63,6 @@ class _StartupScreenState extends State<StartupScreen> {
         ),
       );
     }
-
-    return isLoggedIn
-        ? const MainTabsScreen()
-        : const LoginScreen();
+    return isLoggedIn ? const MainTabsScreen() : const LoginScreen();
   }
 }

@@ -21,16 +21,20 @@ from app.auth_utils import (
     verify_password,
 )
 from app.database import Base, engine, get_db
-from app.models import Ticket, User, Exhibitor
+from app.models import Ticket, User, Exhibitor, EventSettings
 from app.schemas import (
     ExhibitorCreate,
     ExhibitorResponse,
+    PasswordChange,
     TicketCreate,
     TicketResponse,
     TokenResponse,
     UserLogin,
     UserRegister,
     UserResponse,
+    UserUpdate,
+    EventSettingsResponse,
+    EventSettingsUpdate,
 )
 
 load_dotenv()
@@ -254,6 +258,33 @@ def login_user(request: Request, data: UserLogin, db: Session = Depends(get_db))
 @app.get("/api/profile", response_model=UserResponse)
 def get_profile(current_user: User = Depends(get_current_user)):
     return current_user
+
+@app.put("/api/profile", response_model=UserResponse)
+def update_profile(
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.full_name = data.full_name
+    current_user.phone = data.phone
+    current_user.company = data.company
+    current_user.position = data.position
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@app.put("/api/profile/change-password")
+def change_password_endpoint(
+    data: PasswordChange,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not verify_password(data.old_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Неверный текущий пароль")
+    current_user.password_hash = hash_password(data.new_password)
+    db.commit()
+    return {"success": True, "message": "Пароль успешно изменён"}
 
 
 @app.post("/api/ticket", response_model=TicketResponse)
@@ -523,6 +554,41 @@ def update_exhibitor(
         db.refresh(exhibitor)
 
         return exhibitor
+
+def get_or_create_settings(db: Session) -> EventSettings:
+    settings = db.query(EventSettings).first()
+    if not settings:
+        settings = EventSettings()
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    return settings
+
+
+@app.get("/api/settings", response_model=EventSettingsResponse)
+def get_event_settings(db: Session = Depends(get_db)):
+    return get_or_create_settings(db)
+
+
+@app.put("/api/admin/settings", response_model=EventSettingsResponse)
+def update_event_settings(
+    data: EventSettingsUpdate,
+    db: Session = Depends(get_db),
+    current_admin: User = Depends(get_current_admin),
+):
+    settings = get_or_create_settings(db)
+    settings.event_name = data.event_name
+    settings.dates = data.dates
+    settings.location = data.location
+    settings.maps_url = data.maps_url
+    settings.address = data.address
+    settings.telegram_url = data.telegram_url
+    settings.website_url = data.website_url
+    db.commit()
+    db.refresh(settings)
+    return settings
+
+
 @app.get("/api/admin/users", response_model=List[UserResponse])
 def admin_get_users(
     db: Session = Depends(get_db),

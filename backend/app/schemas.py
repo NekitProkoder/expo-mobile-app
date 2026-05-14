@@ -142,3 +142,27 @@ class UserUpdate(BaseModel):
 class PasswordChange(BaseModel):
     old_password: str
     new_password: str
+
+class EventSettingsResponse(BaseModel):
+    id: int
+    event_name: str
+    dates: str
+    location: str
+    maps_url: str
+    address: str
+    telegram_url: str
+    website_url: str
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class EventSettingsUpdate(BaseModel):
+    event_name: str
+    dates: str
+    location: str
+    maps_url: str
+    address: str
+    telegram_url: str
+    website_url: str

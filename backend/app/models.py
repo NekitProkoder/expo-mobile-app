@@ -85,3 +85,18 @@ class Exhibitor(Base):
     logo_url = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class EventSettings(Base):
+    __tablename__ = "event_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    event_name = Column(String(255), default="Euro Shoes Premiere Collection")
+    dates = Column(String(255), default="4–7 марта 2026")
+    location = Column(String(255), default="ЦМТ, Москва")
+    maps_url = Column(Text, default="https://maps.app.goo.gl/1234")
+    address = Column(String(255), default="Москва, Краснопресненская наб., 12")
+    telegram_url = Column(String(255), default="https://t.me/euroshoes")
+    website_url = Column(String(255), default="https://www.euroshoes-moscow.ru")
+
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
