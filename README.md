@@ -1,17 +1,193 @@
-# expo_mobile_app
+# Expo Mobile App
 
-A new Flutter project.
+Мобильное приложение для посетителей выставки Euro Shoes Premiere Collection.
 
-## Getting Started
+## Описание проекта
 
-This project is a starting point for a Flutter application.
+Expo Mobile App — это мобильное приложение для посетителей международной выставки обуви Euro Shoes Premiere Collection.
 
-A few resources to get you started if this is your first Flutter project:
+Приложение позволяет:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- регистрироваться и авторизовываться;
+- получать пригласительные билеты;
+- просматривать PDF-билеты;
+- получать новости выставки;
+- просматривать список участников;
+- сохранять избранных участников;
+- работать с профилем пользователя;
+- использовать административную панель.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Backend приложения интегрирован с Bitrix24 для автоматической обработки заявок и генерации билетов.
+
+---
+
+# Технологии
+
+## Frontend
+
+- Flutter
+- Dart
+- Material Design
+- WebView
+- SharedPreferences
+- HTTP API
+
+## Backend
+
+- FastAPI
+- Python
+- PostgreSQL
+- SQLAlchemy
+- JWT Auth
+- Bitrix24 REST API
+
+---
+
+# Архитектура проекта
+
+```text
+expo_mobile_app/
+├── lib/
+│   ├── config/
+│   ├── models/
+│   ├── screens/
+│   ├── services/
+│   ├── widgets/
+│   └── utils/
+│
+├── assets/
+│
+├── backend/
+│   ├── app/
+│   ├── requirements.txt
+│   └── main.py
+│
+└── README.md
+```
+
+---
+
+# Основные функции
+
+## Авторизация
+
+- регистрация пользователя;
+- вход по email и паролю;
+- JWT токены;
+- роли пользователей.
+
+## Билеты
+
+- создание пригласительного;
+- отображение штрихкода;
+- открытие PDF билета;
+- обновление статуса.
+
+## Участники
+
+- список компаний;
+- карточки участников;
+- поиск;
+- избранное;
+- офлайн кеш.
+
+## Новости
+
+- WebView интеграция с сайтом выставки;
+- автоматическое отображение актуальных новостей.
+
+## Админ панель
+
+- просмотр пользователей;
+- просмотр участников;
+- редактирование участников;
+- административный доступ.
+
+---
+
+# Запуск Flutter
+
+## Установка зависимостей
+
+```bash
+flutter pub get
+```
+
+## Запуск приложения
+
+```bash
+flutter run
+```
+
+---
+
+# Запуск Backend
+
+## Установка зависимостей
+
+```bash
+pip install -r requirements.txt
+```
+
+## Запуск сервера
+
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+---
+
+# Настройка API
+
+Файл:
+
+```text
+lib/config/api_config.dart
+```
+
+Пример:
+
+```dart
+class ApiConfig {
+  static const String baseUrl = 'http://192.168.1.78:8000';
+}
+```
+
+---
+
+# Интеграция с Bitrix24
+
+Backend взаимодействует с Bitrix24 через REST API:
+
+- создание лидов;
+- создание сделок;
+- генерация PDF билетов;
+- хранение данных посетителей.
+
+---
+
+# Скриншоты
+
+## Главный экран
+
+(добавить скриншот)
+
+## Билет
+
+(добавить скриншот)
+
+## Участники
+
+(добавить скриншот)
+
+## Админ панель
+
+(добавить скриншот)
+
+---
+
+# Автор
+
+Станислав  
+Колледж — Информационные системы и программирование  
+Дипломный проект 2026

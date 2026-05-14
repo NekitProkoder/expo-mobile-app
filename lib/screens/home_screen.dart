@@ -111,7 +111,7 @@ class HomeScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -138,11 +138,12 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          Row(
+
+          const Row(
             children: [
-              const Icon(Icons.calendar_month, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
+              Icon(Icons.calendar_month, size: 20),
+              SizedBox(width: 8),
+              Expanded(
                 child: Text(
                   '4–7 марта 2026',
                   style: TextStyle(fontWeight: FontWeight.w700),
@@ -150,12 +151,14 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 8),
-          Row(
+
+          const Row(
             children: [
-              const Icon(Icons.location_on, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
+              Icon(Icons.location_on, size: 20),
+              SizedBox(width: 8),
+              Expanded(
                 child: Text(
                   'ЦМТ, Москва',
                   style: TextStyle(fontWeight: FontWeight.w700),
@@ -163,7 +166,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 20),
+
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -175,7 +180,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.confirmation_number, color: Colors.black),
+              icon: const Icon(
+                Icons.confirmation_number,
+                color: Colors.black,
+              ),
               label: const Text(
                 'Получить билет',
                 style: TextStyle(color: Colors.black),
@@ -292,28 +300,36 @@ class HomeScreen extends StatelessWidget {
             title: 'Получить пригласительный билет',
             screen: const TicketFormScreen(),
           ),
+
           const SizedBox(height: 12),
+
           quickCard(
             context: context,
             icon: Icons.qr_code,
             title: 'Мой билет',
             screen: const MyTicketScreen(),
           ),
+
           const SizedBox(height: 12),
+
           quickCard(
             context: context,
             icon: Icons.article,
             title: 'Новости выставки',
             screen: const NewsScreen(),
           ),
+
           const SizedBox(height: 12),
+
           quickCard(
             context: context,
             icon: Icons.groups,
             title: 'Участники выставки',
             screen: const ParticipantsScreen(),
           ),
+
           const SizedBox(height: 12),
+
           quickCard(
             context: context,
             icon: Icons.person,

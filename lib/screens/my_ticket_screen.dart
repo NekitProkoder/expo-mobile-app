@@ -51,18 +51,19 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
   }
 
   Future<void> openPdfInsideApp(Map ticket) async {
-    final token = await ApiService.getToken();
+  final token = await ApiService.getToken();
 
-    if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не найден токен авторизации')),
-      );
-      return;
-    }
+  if (!mounted) return;
 
-    final ticketId = ticket['id'];
-   final url =
-    '${ApiConfig.baseUrl}/api/tickets/$ticketId/pdf?token=$token';
+  if (token == null || token.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Не найден токен авторизации')),
+    );
+    return;
+  }
+
+  final ticketId = ticket['id'];
+  final url = '${ApiConfig.baseUrl}/api/tickets/$ticketId/pdf?token=$token';
 
     try {
       setState(() {
@@ -303,7 +304,7 @@ Widget barcodeBlock(String? barcode) {
         borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
