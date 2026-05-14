@@ -1,4 +1,4 @@
-package com.example.expo_mobile_app
+package ru.euroshoes.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 
