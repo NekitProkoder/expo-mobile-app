@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../theme/app_theme.dart';
 import 'ticket_form_screen.dart';
 import 'my_ticket_screen.dart';
 import 'news_screen.dart';
@@ -103,8 +103,8 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(26),
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFFACA2C),
-            Color(0xFFFFE07A),
+            AppTheme.primary,
+            AppTheme.primaryLight,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -258,10 +258,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Бизнес Глобал Экспо'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
       ),
       body: ListView(
         padding: const EdgeInsets.all(18),

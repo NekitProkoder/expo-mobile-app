@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:barcode_widget/barcode_widget.dart';
 import '../widgets/app_empty_state.dart';
 import '../widgets/app_loading.dart';
-
+import '../theme/app_theme.dart';
 
 import '../services/api_service.dart';
 import 'pdf_viewer_screen.dart';
@@ -145,8 +145,8 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
         borderRadius: BorderRadius.circular(26),
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFFACA2C),
-            Color(0xFFFFE58A),
+            AppTheme.primary,
+            AppTheme.primaryLight,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -400,10 +400,10 @@ Widget barcodeBlock(String? barcode) {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Мой билет'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
       ),
       body: RefreshIndicator(
         onRefresh: loadTickets,

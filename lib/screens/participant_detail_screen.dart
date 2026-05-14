@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../theme/app_theme.dart';
 import '../models/exhibitor.dart';
 import '../widgets/app_info_tile.dart';
 import '../widgets/app_primary_button.dart';
@@ -60,8 +60,8 @@ class ParticipantDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(26),
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFFACA2C),
-            Color(0xFFFFE58A),
+            AppTheme.primary,
+            AppTheme.primaryLight,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -221,10 +221,10 @@ class ParticipantDetailScreen extends StatelessWidget {
     ].where((e) => e != null && e.isNotEmpty).join(', ');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Участник'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
         actions: [
           IconButton(
             onPressed: onFavoriteChanged,

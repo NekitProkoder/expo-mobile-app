@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/app_theme.dart';
 import '../config/app_links.dart';
 import '../services/api_service.dart';
+import '../utils/validators.dart';
+import '../widgets/app_primary_button.dart';
 
 class TicketFormScreen extends StatefulWidget {
   const TicketFormScreen({super.key});
@@ -22,59 +25,11 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
   bool isLoading = false;
   bool consentAccepted = false;
 
-  String? validateRequired(String? value, String fieldName) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Заполните поле "$fieldName"';
-    }
-
-    if (value.trim().length < 2) {
-      return 'Поле "$fieldName" слишком короткое';
-    }
-
-    return null;
-  }
-
-  String? validateFullName(String? value) {
-    final error = validateRequired(value, 'ФИО');
-    if (error != null) return error;
-
-    final parts = value!.trim().split(RegExp(r'\s+'));
-
-    if (parts.length < 2) {
-      return 'Введите имя и фамилию';
-    }
-
-    return null;
-  }
-
-  String? validatePhone(String? value) {
-    final error = validateRequired(value, 'Телефон');
-    if (error != null) return error;
-
-    final cleaned = value!.replaceAll(RegExp(r'[^0-9+]'), '');
-
-    if (cleaned.length < 10) {
-      return 'Введите корректный телефон';
-    }
-
-    return null;
-  }
-
-  String? validateEmail(String? value) {
-    final error = validateRequired(value, 'Email');
-    if (error != null) return error;
-
-    final email = value!.trim();
-
-    final emailRegex = RegExp(
-      r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+  Future<void> openPrivacy() async {
+    await launchUrl(
+      Uri.parse(AppLinks.privacyPolicy),
+      mode: LaunchMode.externalApplication,
     );
-
-    if (!emailRegex.hasMatch(email)) {
-      return 'Введите корректный Email';
-    }
-
-    return null;
   }
 
   Future<void> sendTicketRequest() async {
@@ -117,9 +72,7 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Ошибка отправки: $e'),
-        ),
+        SnackBar(content: Text('Ошибка отправки: $e')),
       );
     } finally {
       if (mounted) {
@@ -152,10 +105,6 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(
@@ -167,67 +116,6 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
       ),
     );
   }
-
-  Widget consentBlock() {
-  Future<void> openPrivacy() async {
-    await launchUrl(
-      Uri.parse(AppLinks.privacyPolicy),
-      mode: LaunchMode.externalApplication,
-    );
-  }
-
-  return Container(
-    margin: const EdgeInsets.only(bottom: 18),
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(
-        color: consentAccepted ? const Color(0xFFFACA2C) : Colors.grey.shade300,
-      ),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Checkbox(
-          value: consentAccepted,
-          activeColor: const Color(0xFFFACA2C),
-          checkColor: Colors.black,
-          onChanged: (value) {
-            setState(() {
-              consentAccepted = value ?? false;
-            });
-          },
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Wrap(
-              children: [
-                const Text(
-                  'Я даю согласие на обработку персональных данных в соответствии с ',
-                  style: TextStyle(fontSize: 13),
-                ),
-                GestureDetector(
-                  onTap: openPrivacy,
-                  child: const Text(
-                    'политикой конфиденциальности',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w700,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
   Widget headerBlock() {
     return Container(
@@ -260,6 +148,62 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
     );
   }
 
+  Widget consentBlock() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: consentAccepted
+              ? const Color(0xFFFACA2C)
+              : Colors.grey.shade300,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Checkbox(
+            value: consentAccepted,
+            activeColor: const Color(0xFFFACA2C),
+            checkColor: Colors.black,
+            onChanged: (value) {
+              setState(() {
+                consentAccepted = value ?? false;
+              });
+            },
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Wrap(
+                children: [
+                  const Text(
+                    'Я даю согласие на обработку персональных данных в соответствии с ',
+                    style: TextStyle(fontSize: 13),
+                  ),
+                  GestureDetector(
+                    onTap: openPrivacy,
+                    child: const Text(
+                      'политикой конфиденциальности',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.red,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -273,10 +217,10 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text('Получить билет'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
       ),
       body: Form(
         key: _formKey,
@@ -284,66 +228,45 @@ class _TicketFormScreenState extends State<TicketFormScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             headerBlock(),
-
             field(
               label: 'ФИО *',
               controller: nameController,
-              validator: validateFullName,
+              validator: Validators.fullName,
               icon: Icons.person,
             ),
-
             field(
               label: 'Телефон *',
               controller: phoneController,
-              validator: validatePhone,
+              validator: Validators.phone,
               keyboardType: TextInputType.phone,
               icon: Icons.phone,
             ),
-
             field(
               label: 'Email *',
               controller: emailController,
-              validator: validateEmail,
+              validator: Validators.email,
               keyboardType: TextInputType.emailAddress,
               icon: Icons.email,
             ),
-
             field(
               label: 'Компания *',
               controller: companyController,
-              validator: (value) => validateRequired(value, 'Компания'),
+              validator: (value) =>
+                  Validators.requiredField(value, 'Компания'),
               icon: Icons.business,
             ),
-
             field(
               label: 'Должность *',
               controller: positionController,
-              validator: (value) => validateRequired(value, 'Должность'),
+              validator: (value) =>
+                  Validators.requiredField(value, 'Должность'),
               icon: Icons.badge,
             ),
-
             consentBlock(),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : sendTicketRequest,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFACA2C),
-                  disabledBackgroundColor: Colors.grey.shade300,
-                  padding: const EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-                child: Text(
-                  isLoading ? 'Отправка...' : 'Получить пригласительный',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+            AppPrimaryButton(
+              text: 'Получить пригласительный',
+              onPressed: sendTicketRequest,
+              isLoading: isLoading,
             ),
           ],
         ),

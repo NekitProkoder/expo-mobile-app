@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_tabs_screen.dart';
 import 'services/api_service.dart';
@@ -16,15 +16,7 @@ class ExpoApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Euro Shoes Expo',
-      theme: ThemeData(
-        primaryColor: const Color(0xFFFACA2C),
-        scaffoldBackgroundColor: const Color(0xFFF7F7F7),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFFACA2C),
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       home: const StartupScreen(),
     );
   }

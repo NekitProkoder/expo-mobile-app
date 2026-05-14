@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
+import '../utils/validators.dart';
 import '../services/api_service.dart';
 import 'main_tabs_screen.dart';
 import 'register_screen.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,32 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isLoading = false;
   bool showPassword = false;
-
-  String? validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Введите Email';
-    }
-
-    final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Введите корректный Email';
-    }
-
-    return null;
-  }
-
-  String? validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Введите пароль';
-    }
-
-    if (value.length < 5) {
-      return 'Пароль должен быть не менее 6 символов';
-    }
-
-    return null;
-  }
 
   Future<void> login() async {
     FocusScope.of(context).unfocus();
@@ -109,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(
-              color: Color(0xFFFACA2C),
+              color: AppTheme.primary,
               width: 2,
             ),
           ),
@@ -123,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: const Color(0xFFFACA2C),
+        color: AppTheme.primary,
         borderRadius: BorderRadius.circular(24),
       ),
       child: const Column(
@@ -168,10 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text('Вход'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
       ),
       body: Form(
         key: _formKey,
@@ -184,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
             field(
               label: 'Email',
               controller: emailController,
-              validator: validateEmail,
+              validator: Validators.email,
               keyboardType: TextInputType.emailAddress,
               icon: Icons.email,
             ),
@@ -192,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
             field(
               label: 'Пароль',
               controller: passwordController,
-              validator: validatePassword,
+              validator: Validators.password,
               obscureText: !showPassword,
               icon: Icons.lock,
               suffixIcon: IconButton(
@@ -214,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ElevatedButton(
                 onPressed: isLoading ? null : login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFACA2C),
+                  backgroundColor: AppTheme.primary,
                   disabledBackgroundColor: Colors.grey.shade300,
                   padding: const EdgeInsets.all(16),
                   shape: RoundedRectangleBorder(

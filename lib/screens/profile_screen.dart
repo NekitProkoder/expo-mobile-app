@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../theme/app_theme.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 import '../widgets/app_info_tile.dart';
@@ -9,6 +9,7 @@ import 'login_screen.dart';
 import 'my_ticket_screen.dart';
 import 'settings_screen.dart';
 import 'ticket_form_screen.dart';
+import 'admin_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -132,10 +133,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text('Личный кабинет'),
-        backgroundColor: const Color(0xFFFACA2C),
+        backgroundColor: AppTheme.primary,
         actions: [
           IconButton(
             onPressed: logout,
@@ -175,6 +176,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
 
           const SizedBox(height: 10),
+          if (currentUser.isAdmin)
+  AppMenuCard(
+    icon: Icons.admin_panel_settings,
+    title: 'Админ-панель',
+    subtitle: 'Управление участниками и пользователями',
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AdminScreen(),
+        ),
+      );
+    },
+  ),
 
           AppMenuCard(
             icon: Icons.settings,
