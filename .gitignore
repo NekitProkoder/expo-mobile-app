@@ -1,0 +1,43 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Android / iOS generated
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Windows / macOS / Linux build
+windows/flutter/ephemeral/
+macos/Flutter/ephemeral/
+linux/flutter/ephemeral/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# System
+.DS_Store
+Thumbs.db
+
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/app/__pycache__/
+*.pyc
+
+# Env / secrets
+backend/.env
+.env
+
+# Logs
+*.log
