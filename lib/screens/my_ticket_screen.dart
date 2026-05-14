@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:barcode_widget/barcode_widget.dart';
+import '../widgets/app_empty_state.dart';
+import '../widgets/app_loading.dart';
 
 
 import '../services/api_service.dart';
@@ -382,45 +384,18 @@ Widget barcodeBlock(String? barcode) {
   }
 
   Widget emptyState() {
-    return ListView(
-      children: [
-        const SizedBox(height: 180),
-        Icon(
-          Icons.confirmation_number_outlined,
-          size: 82,
-          color: Colors.grey.shade400,
-        ),
-        const SizedBox(height: 18),
-        const Center(
-          child: Text(
-            'У вас пока нет билетов',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Center(
-          child: Text(
-            'Оформите пригласительный билет на главной странице',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black54),
-          ),
-        ),
-      ],
+    return const AppEmptyState(
+      icon: Icons.confirmation_number_outlined,
+      title: 'У вас пока нет билетов',
+      subtitle: 'Оформите пригласительный билет на главной странице',
     );
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFFFACA2C),
-          ),
-        ),
+        body: AppLoading(text: 'Загрузка билетов...'),
       );
     }
 
