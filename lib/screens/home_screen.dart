@@ -16,14 +16,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Map<String, dynamic> _settings = {
-    'event_name': 'Euro Shoes\nPremiere Collection',
-    'dates': '4–7 марта 2026',
-    'location': 'ЦМТ, Москва',
-    'maps_url': 'https://maps.app.goo.gl/W6Y2yXoP1nZGSWcP6',
-    'telegram_url': 'https://t.me/euroshoes',
-    'website_url': 'https://www.euroshoes-moscow.ru',
-  };
+  Map<String, dynamic>? _settings;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -32,11 +26,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadSettings() async {
+    setState(() => _isLoading = true);
     try {
       final data = await ApiService.getEventSettings();
       if (!mounted) return;
-      setState(() => _settings = data);
-    } catch (_) {}
+      setState(() {
+        _settings = data;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _openUrl(String url) async {
@@ -63,36 +64,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF5a4800))),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-          ),
-        ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _loadSettings,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-          children: [
-            _HeroBlock(
-              settings: _settings,
-              onTicketTap: () => _navigate(const TicketFormScreen()),
-              onMapsTap: () => _openUrl(_settings['maps_url'] ?? ''),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primary),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadSettings,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                children: [
+                  _HeroBlock(
+                    settings: _settings ?? {},
+                    onTicketTap: () => _navigate(const TicketFormScreen()),
+                    onMapsTap: () => _openUrl(
+                        _settings?['maps_url'] ?? 'https://maps.app.goo.gl/W6Y2yXoP1nZGSWcP6'),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildStats(),
+                  const SizedBox(height: 20),
+                  _buildSectionLabel('Быстрые действия'),
+                  const SizedBox(height: 10),
+                  _buildQuickGrid(),
+                  const SizedBox(height: 20),
+                  _buildSectionLabel('Связь с выставкой'),
+                  const SizedBox(height: 10),
+                  _buildContactRow(),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            _buildStats(),
-            const SizedBox(height: 20),
-            _buildSectionLabel('Быстрые действия'),
-            const SizedBox(height: 10),
-            _buildQuickGrid(),
-            const SizedBox(height: 20),
-            _buildSectionLabel('Связь с выставкой'),
-            const SizedBox(height: 10),
-            _buildContactRow(),
-          ],
-        ),
-      ),
     );
   }
 
@@ -119,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.black)),
+            Text(value,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w800, color: Colors.black)),
             const SizedBox(height: 3),
             Text(label, style: const TextStyle(fontSize: 11, color: Colors.black54)),
           ],
@@ -131,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSectionLabel(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black54, letterSpacing: 0.2),
+      style: const TextStyle(
+          fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black54, letterSpacing: 0.2),
     );
   }
 
@@ -173,7 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Icon(item.icon, size: 20, color: const Color(0xFF5a4800)),
                   ),
                   Text(item.title,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black)),
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black)),
                 ],
               ),
             ),
@@ -186,11 +190,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildContactRow() {
     return Row(
       children: [
-        Expanded(child: _contactBtn(Icons.send_rounded, 'Telegram',
-            () => _openUrl(_settings['telegram_url'] ?? 'https://t.me/euroshoes'))),
+        Expanded(
+            child: _contactBtn(Icons.send_rounded, 'Telegram',
+                () => _openUrl(_settings?['telegram_url'] ?? 'https://t.me/euroshoes'))),
         const SizedBox(width: 10),
-        Expanded(child: _contactBtn(Icons.language_rounded, 'Сайт',
-            () => _openUrl(_settings['website_url'] ?? 'https://www.euroshoes-moscow.ru'))),
+        Expanded(
+            child: _contactBtn(Icons.language_rounded, 'Сайт',
+                () => _openUrl(_settings?['website_url'] ?? 'https://www.euroshoes-moscow.ru'))),
       ],
     );
   }
@@ -209,7 +215,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Icon(icon, size: 18, color: Colors.black87),
               const SizedBox(width: 7),
-              Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
+              Text(label,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87)),
             ],
           ),
         ),
@@ -222,7 +230,12 @@ class _HeroBlock extends StatelessWidget {
   final Map<String, dynamic> settings;
   final VoidCallback onTicketTap;
   final VoidCallback onMapsTap;
-  const _HeroBlock({required this.settings, required this.onTicketTap, required this.onMapsTap});
+
+  const _HeroBlock({
+    required this.settings,
+    required this.onTicketTap,
+    required this.onMapsTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +245,10 @@ class _HeroBlock extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(22)),
+      decoration: BoxDecoration(
+        color: AppTheme.primary,
+        borderRadius: BorderRadius.circular(22),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -244,12 +260,17 @@ class _HeroBlock extends StatelessWidget {
             ),
             child: Text(
               '${dates.toUpperCase()} · ${location.toUpperCase()}',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF3a2e00), letterSpacing: 0.5),
+              style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3a2e00),
+                  letterSpacing: 0.5),
             ),
           ),
           const SizedBox(height: 12),
           Text(eventName,
-              style: const TextStyle(fontSize: 26, height: 1.15, fontWeight: FontWeight.w900, color: Colors.black)),
+              style: const TextStyle(
+                  fontSize: 26, height: 1.15, fontWeight: FontWeight.w900, color: Colors.black)),
           const SizedBox(height: 6),
           const Text('Мобильный помощник посетителя выставки',
               style: TextStyle(fontSize: 13, color: Color(0xFF3a2e00))),
@@ -258,7 +279,9 @@ class _HeroBlock extends StatelessWidget {
             children: [
               const Icon(Icons.calendar_month_outlined, size: 16, color: Color(0xFF3a2e00)),
               const SizedBox(width: 6),
-              Text(dates, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
+              Text(dates,
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
             ],
           ),
           const SizedBox(height: 6),
@@ -288,7 +311,8 @@ class _HeroBlock extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onTicketTap,
-              icon: const Icon(Icons.confirmation_number_outlined, color: AppTheme.primary, size: 20),
+              icon: const Icon(Icons.confirmation_number_outlined,
+                  color: AppTheme.primary, size: 20),
               label: const Text('Получить билет',
                   style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(

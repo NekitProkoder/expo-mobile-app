@@ -148,6 +148,9 @@ def get_current_admin(
 
 
 def sync_ticket_from_bitrix(ticket: Ticket, db: Session) -> Ticket:
+    deals = []
+
+    # 1. Сначала ищем по пользовательскому полю сделки
     deal_list = bitrix_call(
         "crm.deal.list",
         {
@@ -157,6 +160,7 @@ def sync_ticket_from_bitrix(ticket: Ticket, db: Session) -> Ticket:
             "select": [
                 "ID",
                 "TITLE",
+                "COMMENTS",
                 DEAL_APP_REQUEST_FIELD,
                 DEAL_BARCODE_FIELD,
                 DEAL_PDF_FIELD,
@@ -168,6 +172,34 @@ def sync_ticket_from_bitrix(ticket: Ticket, db: Session) -> Ticket:
     )
 
     deals = deal_list.get("result", [])
+
+    # 2. Если по полю не нашли — ищем последние сделки и проверяем COMMENTS
+    if not deals:
+        fallback_deals = bitrix_call(
+            "crm.deal.list",
+            {
+                "select": [
+                    "ID",
+                    "TITLE",
+                    "COMMENTS",
+                    DEAL_APP_REQUEST_FIELD,
+                    DEAL_BARCODE_FIELD,
+                    DEAL_PDF_FIELD,
+                ],
+                "order": {
+                    "ID": "DESC",
+                },
+                "start": 0,
+            },
+        ).get("result", [])
+
+        for deal in fallback_deals:
+            comments = deal.get("COMMENTS") or ""
+            title = deal.get("TITLE") or ""
+
+            if ticket.app_request_id in comments or ticket.app_request_id in title:
+                deals = [deal]
+                break
 
     if not deals:
         ticket.status = "waiting_bitrix_deal"
@@ -297,7 +329,7 @@ def create_ticket(
 
     payload = {
         "fields": {
-            "TITLE": f"Заявка на пригласительный билет — {data.full_name}",
+            "TITLE": f"Приглашение на выставку Euro Shoes Premiere Collection® 2026 — {data.full_name}",
             "NAME": data.full_name,
             "PHONE": [{"VALUE": data.phone, "VALUE_TYPE": "WORK"}],
             "EMAIL": [{"VALUE": data.email, "VALUE_TYPE": "WORK"}],
