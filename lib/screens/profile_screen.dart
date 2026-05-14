@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../models/user.dart';
 import '../services/api_service.dart';
+import '../widgets/app_info_tile.dart';
+import '../widgets/app_loading.dart';
+import '../widgets/app_menu_card.dart';
 import 'login_screen.dart';
 import 'my_ticket_screen.dart';
 import 'settings_screen.dart';
@@ -57,56 +60,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget infoRow(String title, String value) {
+  Widget headerBlock(UserModel currentUser) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 18),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFFFACA2C),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.black54),
+          CircleAvatar(
+            radius: 34,
+            backgroundColor: Colors.white,
+            child: Icon(
+              currentUser.isAdmin
+                  ? Icons.admin_panel_settings
+                  : Icons.person,
+              size: 36,
+              color: Colors.black,
             ),
           ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  currentUser.fullName,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  currentUser.isAdmin ? 'Администратор' : 'Посетитель',
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget menuButton({
-    required IconData icon,
-    required String title,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, color: Colors.black),
-        label: Text(
-          title,
-          style: const TextStyle(color: Colors.black),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFACA2C),
-          padding: const EdgeInsets.all(16),
-          alignment: Alignment.centerLeft,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
       ),
     );
   }
@@ -115,11 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFFFACA2C),
-          ),
-        ),
+        body: AppLoading(text: 'Загрузка профиля...'),
       );
     }
 
@@ -149,68 +143,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(18),
-        child: ListView(
-          children: [
-            const Text(
-              'Профиль посетителя',
-              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 18),
+        children: [
+          headerBlock(currentUser),
 
-            infoRow('ФИО', currentUser.fullName),
-            infoRow('Email', currentUser.email),
-            infoRow('Телефон', currentUser.phone),
-            infoRow('Компания', currentUser.company ?? ''),
-            infoRow('Должность', currentUser.position ?? ''),
-            infoRow(
-              'Роль',
-              currentUser.isAdmin ? 'Администратор' : 'Посетитель',
-            ),
+          AppInfoTile(
+            icon: Icons.person,
+            title: 'ФИО',
+            value: currentUser.fullName,
+          ),
+          AppInfoTile(
+            icon: Icons.email,
+            title: 'Email',
+            value: currentUser.email,
+          ),
+          AppInfoTile(
+            icon: Icons.phone,
+            title: 'Телефон',
+            value: currentUser.phone,
+          ),
+          AppInfoTile(
+            icon: Icons.business,
+            title: 'Компания',
+            value: currentUser.company,
+          ),
+          AppInfoTile(
+            icon: Icons.badge,
+            title: 'Должность',
+            value: currentUser.position,
+          ),
 
-            const SizedBox(height: 18),
+          const SizedBox(height: 10),
 
-            menuButton(
-              icon: Icons.settings,
-              title: 'Настройки и информация',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
+          AppMenuCard(
+            icon: Icons.settings,
+            title: 'Настройки и информация',
+            subtitle: 'Политика, сайт и сведения о приложении',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SettingsScreen(),
+                ),
+              );
+            },
+          ),
 
-            menuButton(
-              icon: Icons.confirmation_number,
-              title: 'Получить пригласительный билет',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const TicketFormScreen(),
-                  ),
-                );
-              },
-            ),
+          AppMenuCard(
+            icon: Icons.confirmation_number,
+            title: 'Получить пригласительный билет',
+            subtitle: 'Оформить заявку на посещение выставки',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TicketFormScreen(),
+                ),
+              );
+            },
+          ),
 
-            menuButton(
-              icon: Icons.qr_code,
-              title: 'Мои билеты',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MyTicketScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+          AppMenuCard(
+            icon: Icons.qr_code,
+            title: 'Мои билеты',
+            subtitle: 'Посмотреть статус и PDF билет',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyTicketScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
