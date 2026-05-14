@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/exhibitor.dart';
+import '../widgets/app_info_tile.dart';
+import '../widgets/app_primary_button.dart';
 
 class ParticipantDetailScreen extends StatelessWidget {
   final Exhibitor exhibitor;
@@ -16,8 +18,10 @@ class ParticipantDetailScreen extends StatelessWidget {
   });
 
   Future<void> openUrl(String url) async {
-    final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Future<void> callPhone(String? phone) async {
@@ -85,8 +89,8 @@ class ParticipantDetailScreen extends StatelessWidget {
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 10),
-          if ((exhibitor.category ?? '').isNotEmpty)
+          if ((exhibitor.category ?? '').isNotEmpty) ...[
+            const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
@@ -101,6 +105,7 @@ class ParticipantDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
+          ],
           if ((exhibitor.standNumber ?? '').isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
@@ -170,55 +175,6 @@ class ParticipantDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget infoTile({
-    required IconData icon,
-    required String title,
-    required String? value,
-  }) {
-    if (value == null || value.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: Colors.black87),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget descriptionBlock() {
     final description = exhibitor.description;
 
@@ -257,30 +213,6 @@ class ParticipantDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget favoriteButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onFavoriteChanged,
-        icon: Icon(
-          isFavorite ? Icons.star : Icons.star_border,
-          color: isFavorite ? const Color(0xFFFACA2C) : Colors.black,
-        ),
-        label: Text(
-          isFavorite ? 'В избранном' : 'Добавить в избранное',
-          style: const TextStyle(color: Colors.black),
-        ),
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.all(15),
-          side: const BorderSide(color: Color(0xFFFACA2C)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final location = [
@@ -310,40 +242,44 @@ class ParticipantDetailScreen extends StatelessWidget {
           const SizedBox(height: 14),
           quickActions(),
           const SizedBox(height: 14),
-          favoriteButton(),
+          AppPrimaryButton(
+            text: isFavorite ? 'В избранном' : 'Добавить в избранное',
+            icon: isFavorite ? Icons.star : Icons.star_border,
+            onPressed: onFavoriteChanged,
+          ),
           const SizedBox(height: 16),
           descriptionBlock(),
-          infoTile(
+          AppInfoTile(
             icon: Icons.store,
             title: 'Компания',
             value: exhibitor.name,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.category,
             title: 'Категория',
             value: exhibitor.category,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.location_on,
             title: 'Стенд',
             value: exhibitor.standNumber,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.public,
             title: 'Локация',
             value: location.isEmpty ? null : location,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.phone,
             title: 'Телефон',
             value: exhibitor.phone,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.email,
             title: 'Email',
             value: exhibitor.email,
           ),
-          infoTile(
+          AppInfoTile(
             icon: Icons.language,
             title: 'Сайт',
             value: exhibitor.website,
