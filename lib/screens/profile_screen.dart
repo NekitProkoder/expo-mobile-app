@@ -10,6 +10,8 @@ import 'my_ticket_screen.dart';
 import 'settings_screen.dart';
 import 'ticket_form_screen.dart';
 import 'admin_screen.dart';
+import 'change_password_screen.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -176,6 +178,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
 
           const SizedBox(height: 10),
+          AppMenuCard(
+  icon: Icons.edit,
+  title: 'Редактировать профиль',
+  subtitle: 'Изменить ФИО, телефон, компанию и должность',
+  onTap: () async {
+    final updated = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditProfileScreen(user: currentUser),
+      ),
+    );
+
+    if (updated == true) {
+      loadProfile();
+    }
+  },
+),
+
+AppMenuCard(
+  icon: Icons.lock,
+  title: 'Сменить пароль',
+  subtitle: 'Обновить пароль для входа',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ChangePasswordScreen(),
+      ),
+    );
+  },
+),
           if (currentUser.isAdmin)
   AppMenuCard(
     icon: Icons.admin_panel_settings,

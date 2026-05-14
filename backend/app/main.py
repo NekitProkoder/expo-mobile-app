@@ -5,10 +5,13 @@ from typing import List, Optional
 
 import requests
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
 from app.auth_utils import (
@@ -34,9 +37,15 @@ load_dotenv()
 
 app = FastAPI(title="Expo Mobile Backend")
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -196,7 +205,8 @@ def root():
 
 
 @app.post("/api/auth/register", response_model=TokenResponse)
-def register_user(data: UserRegister, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def register_user(request: Request, data: UserRegister, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == data.email).first()
 
     if existing_user:
@@ -225,7 +235,8 @@ def register_user(data: UserRegister, db: Session = Depends(get_db)):
 
 
 @app.post("/api/auth/login", response_model=TokenResponse)
-def login_user(data: UserLogin, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login_user(request: Request, data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
 
     if not user or not verify_password(data.password, user.password_hash):
@@ -347,11 +358,9 @@ def sync_ticket(
 @app.get("/api/tickets/{ticket_id}/pdf")
 def download_ticket_pdf(
     ticket_id: int,
-    token: str = Query(...),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    current_user = get_user_by_token(token, db)
-
     ticket = (
         db.query(Ticket)
         .filter(Ticket.id == ticket_id, Ticket.user_id == current_user.id)

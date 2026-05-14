@@ -129,3 +129,16 @@ class ExhibitorResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    full_name: str
+    phone: str
+
+    company: Optional[str] = None
+    position: Optional[str] = None
+
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str

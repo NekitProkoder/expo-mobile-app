@@ -239,4 +239,53 @@ static Future<void> setUserAdmin(int userId, bool isAdmin) async {
     throw Exception(response.body);
   }
 }
+static Future<void> updateProfile({
+  required String fullName,
+  required String phone,
+  String? company,
+  String? position,
+}) async {
+  final token = await getToken();
+
+  final response = await http.put(
+    Uri.parse('$baseUrl/api/profile'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'full_name': fullName,
+      'phone': phone,
+      'company': company,
+      'position': position,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(response.body);
+  }
+}
+
+static Future<void> changePassword({
+  required String oldPassword,
+  required String newPassword,
+}) async {
+  final token = await getToken();
+
+  final response = await http.put(
+    Uri.parse('$baseUrl/api/profile/change-password'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'old_password': oldPassword,
+      'new_password': newPassword,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(response.body);
+  }
+}
 }
